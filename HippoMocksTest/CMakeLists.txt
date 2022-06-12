@@ -34,6 +34,7 @@ add_executable(${PROJECT_NAME}
     test_ref_args.cpp
 	test_regression_arg_count.cpp
 	test_retval.cpp
+	test_unique_ptr.cpp
 	test_transaction.cpp
 	test_zombie.cpp
 )
