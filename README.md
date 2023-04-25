@@ -165,7 +165,7 @@ You can further filter the NeverCall() trigger by using the [After() method](#af
 The TCall class cannot be instantiated directly. Nevertheless, it useful in order to create conditionals or sequences between mocks that have been instantiated.
 
 ## Return() Method
-Return() must be used to terminate a mock that returns a value (any non-void function).
+Return() must be used to terminate a mock that returns a value for any non-void function. Void functions do not use the Return() method.
 
 ``` C++
 #include "hippomocks.h"
