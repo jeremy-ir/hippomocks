@@ -496,7 +496,7 @@ inline std::ostream &operator<<(std::ostream &os, ByRef<T> &ref) {
 template <typename T>
 struct printArg
 {
-  static inline void print(std::ostream &os, T arg, bool withComma)
+  static inline void print(std::ostream &os, const T& arg, bool withComma)
   {
     if (withComma)
       os << ",";
@@ -659,7 +659,7 @@ public:
   O o;
   P p;
   ref_tuple(A valueA = A(), B valueB = B(), C valueC = C(), D valueD = D(), E valueE = E(), F valueF = F(), G valueG = G(), H valueH = H(), I valueI = I(), J valueJ = J(), K valueK = K(), L valueL = L(), M valueM = M(), N valueN = N(), O valueO = O(), P valueP = P())
-      : a(valueA), b(valueB), c(valueC), d(valueD), e(valueE), f(valueF), g(valueG), h(valueH), i(valueI), j(valueJ), k(valueK), l(valueL), m(valueM), n(valueN), o(valueO), p(valueP)
+      : a(std::forward<A>(valueA)), b(valueB), c(valueC), d(valueD), e(valueE), f(valueF), g(valueG), h(valueH), i(valueI), j(valueJ), k(valueK), l(valueL), m(valueM), n(valueN), o(valueO), p(valueP)
   {}
   virtual void printTo(std::ostream &os) const
   {
@@ -4462,13 +4462,13 @@ public:
     return myRepo->template DoExpectation<Y>(realMock, realMock->translateX(X), ref_tuple<>());
   }
   template <int X, typename A>
-  Y expectation1(A a)
+  Y expectation1(A&& a)
   {
     mock<Z> *realMock = mock<Z>::getRealThis();
     if (realMock->isZombie)
       RAISEEXCEPTION(ZombieMockException(realMock->repo));
     MockRepository *myRepo = realMock->repo;
-    return myRepo->template DoExpectation<Y>(realMock, realMock->translateX(X), ref_tuple<A>(a));
+    return myRepo->template DoExpectation<Y>(realMock, realMock->translateX(X), ref_tuple<A>(std::forward<A>(a)));
   }
   template <int X, typename A, typename B>
   Y expectation2(A a, B b)
@@ -4900,13 +4900,13 @@ public:
     myRepo->DoVoidExpectation(realMock, realMock->translateX(X), ref_tuple<>());
   }
   template <int X, typename A>
-  void expectation1(A a)
+  void expectation1(A&& a)
   {
     mock<Z> *realMock = mock<Z>::getRealThis();
     if (realMock->isZombie)
       RAISEEXCEPTION(ZombieMockException(realMock->repo));
     MockRepository *myRepo = realMock->repo;
-    myRepo->DoVoidExpectation(realMock, realMock->translateX(X), ref_tuple<A>(a));
+    myRepo->DoVoidExpectation(realMock, realMock->translateX(X), ref_tuple<A>(std::forward<A>(a)));
   }
   template <int X, typename A, typename B>
   void expectation2(A a, B b)
@@ -6100,7 +6100,7 @@ template <int X, typename Z2, typename Y, typename Z, typename A>
 TCall<Y,A> &MockRepository::RegisterExpect_(Z2 *mck, Y (Z::*func)(A), RegistrationType expect, const char *functionName, const char *fileName, unsigned long lineNo)
 {
   std::pair<int, int> funcIndex = virtual_index((Y(Z2::*)(A))func);
-  Y (mockFuncs<Z2, Y>::*mfp)(A);
+  Y (mockFuncs<Z2, Y>::*mfp)(A&&);
   mfp = &mockFuncs<Z2, Y>::template expectation1<X,A>;
   BasicRegisterExpect(reinterpret_cast<mock<Z2> *>(mck),
             funcIndex.first, funcIndex.second,
