@@ -533,8 +533,10 @@ struct no_cref<const X &> { typedef X type; };
 
 template <typename A> struct with_const { typedef const A type; };
 template <typename A> struct with_const<A &> { typedef const A &type; };
+template <typename A> struct with_const<A &&> { typedef const A &type; };
 template <typename A> struct with_const<const A> { typedef const A type; };
 template <typename A> struct with_const<const A &> { typedef const A &type; };
+template <typename A> struct with_const<const A &&> { typedef const A &type; };
 
 template <typename T> struct base_type { typedef T type; };
 template <typename T> struct base_type<T&> { typedef T type; };
@@ -544,21 +546,21 @@ template <typename T> struct base_type<const T&> { typedef T type; };
 template <typename T>
 struct comparer
 {
-  static inline bool compare(typename with_const<T>::type a, typename with_const<T>::type b)
+  static inline bool compare(typename with_const<T>::type& a, typename with_const<T>::type& b)
   {
     return a == b;
   }
-  static inline bool compare(DontCare, typename with_const<T>::type)
+  static inline bool compare(DontCare, typename with_const<T>::type&)
   {
     return true;
   }
   template <typename U>
-  static inline bool compare(const ByRef<U> &a, typename with_const<T>::type b)
+  static inline bool compare(const ByRef<U> &a, typename with_const<T>::type& b)
   {
   return &a.arg == &b;
   }
   template <typename U>
-  static inline bool compare(const DerefParam<U> a, typename with_const<T>::type b)
+  static inline bool compare(const DerefParam<U> a, typename with_const<T>::type& b)
   {
   return b && (a.value == *b);
   }
@@ -626,13 +628,13 @@ struct do_assign<T1, T2, false>
 template <typename T1, typename T2>
 void out_assign(T1 a, T2 b)
 {
-  do_assign<T1, T2, IsOutParamType<typename base_type<T1>::type>::value >::assign_to(a, b);
+  do_assign<T1, T2, IsOutParamType<typename base_type<T1>::type>::value >::assign_to(a, std::forward<T2>(b));
 }
 
 template <typename T1, typename T2>
 void in_assign(T1 a, T2 b)
 {
-  do_assign<T1, T2, IsInParamType<typename base_type<T1>::type>::value >::assign_from(a, b);
+  do_assign<T1, T2, IsInParamType<typename base_type<T1>::type>::value >::assign_from(a, std::forward<T2>(b));
 }
 
 template <typename A = NullType, typename B = NullType, typename C = NullType, typename D = NullType,
@@ -711,6 +713,12 @@ struct store_as<B&>
   typedef typename no_array<B>::type type;
 };
 
+template <typename B>
+struct store_as<B&&>
+{
+  typedef typename no_array<B>::type type;
+};
+
 template <typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H,
       typename I, typename J, typename K, typename L, typename M, typename N, typename O, typename P,
       typename CA, typename CB, typename CC, typename CD, typename CE, typename CF, typename CG, typename CH,
@@ -765,7 +773,7 @@ public:
   }
   void assign_from(ref_tuple<A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P> &from)
   {
-    in_assign< typename store_as<CA>::type, A>(a, from.a);
+    in_assign< typename store_as<CA>::type, A>(a, std::forward<A>(from.a));
     in_assign< typename store_as<CB>::type, B>(b, from.b);
     in_assign< typename store_as<CC>::type, C>(c, from.c);
     in_assign< typename store_as<CD>::type, D>(d, from.d);
@@ -784,7 +792,7 @@ public:
   }
   void assign_to(ref_tuple<A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P> &to)
   {
-    out_assign< typename store_as<CA>::type, A>(a, to.a);
+    out_assign< typename store_as<CA>::type, A>(a, std::forward<A>(to.a));
     out_assign< typename store_as<CB>::type, B>(b, to.b);
     out_assign< typename store_as<CC>::type, C>(c, to.c);
     out_assign< typename store_as<CD>::type, D>(d, to.d);
