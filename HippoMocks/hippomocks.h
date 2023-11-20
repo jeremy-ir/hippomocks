@@ -4470,7 +4470,7 @@ public:
     return myRepo->template DoExpectation<Y>(realMock, realMock->translateX(X), ref_tuple<>());
   }
   template <int X, typename A>
-  Y expectation1(A&& a)
+  Y expectation1(A a)
   {
     mock<Z> *realMock = mock<Z>::getRealThis();
     if (realMock->isZombie)
@@ -4908,7 +4908,7 @@ public:
     myRepo->DoVoidExpectation(realMock, realMock->translateX(X), ref_tuple<>());
   }
   template <int X, typename A>
-  void expectation1(A&& a)
+  void expectation1(A a)
   {
     mock<Z> *realMock = mock<Z>::getRealThis();
     if (realMock->isZombie)
@@ -6108,7 +6108,7 @@ template <int X, typename Z2, typename Y, typename Z, typename A>
 TCall<Y,A> &MockRepository::RegisterExpect_(Z2 *mck, Y (Z::*func)(A), RegistrationType expect, const char *functionName, const char *fileName, unsigned long lineNo)
 {
   std::pair<int, int> funcIndex = virtual_index((Y(Z2::*)(A))func);
-  Y (mockFuncs<Z2, Y>::*mfp)(A&&);
+  Y (mockFuncs<Z2, Y>::*mfp)(A);
   mfp = &mockFuncs<Z2, Y>::template expectation1<X,A>;
   BasicRegisterExpect(reinterpret_cast<mock<Z2> *>(mck),
             funcIndex.first, funcIndex.second,
