@@ -658,22 +658,29 @@ class ref_tuple : public base_tuple
 {
 public:
   typename store_ref<A>::type a;
-  B b;
-  C c;
-  D d;
-  E e;
-  F f;
-  G g;
-  H h;
-  I i;
-  J j;
-  K k;
-  L l;
-  M m;
-  N n;
-  O o;
-  P p;
-  ref_tuple(typename store_ref<A>::type valueA = A(), B valueB = B(), C valueC = C(), D valueD = D(), E valueE = E(), F valueF = F(), G valueG = G(), H valueH = H(), I valueI = I(), J valueJ = J(), K valueK = K(), L valueL = L(), M valueM = M(), N valueN = N(), O valueO = O(), P valueP = P())
+  typename store_ref<B>::type b;
+  typename store_ref<C>::type c;
+  typename store_ref<D>::type d;
+  typename store_ref<E>::type e;
+  typename store_ref<F>::type f;
+  typename store_ref<G>::type g;
+  typename store_ref<H>::type h;
+  typename store_ref<I>::type i;
+  typename store_ref<J>::type j;
+  typename store_ref<K>::type k;
+  typename store_ref<L>::type l;
+  typename store_ref<M>::type m;
+  typename store_ref<N>::type n;
+  typename store_ref<O>::type o;
+  typename store_ref<P>::type p;
+  ref_tuple(typename store_ref<A>::type valueA = A(), typename store_ref<B>::type valueB = B(),
+    typename store_ref<C>::type valueC = C(), typename store_ref<D>::type valueD = D(),
+    typename store_ref<E>::type valueE = E(), typename store_ref<F>::type valueF = F(),
+    typename store_ref<G>::type valueG = G(), typename store_ref<H>::type valueH = H(),
+    typename store_ref<I>::type valueI = I(), typename store_ref<J>::type valueJ = J(),
+    typename store_ref<K>::type valueK = K(), typename store_ref<L>::type valueL = L(),
+    typename store_ref<M>::type valueM = M(), typename store_ref<N>::type valueN = N(),
+    typename store_ref<O>::type valueO = O(), typename store_ref<P>::type valueP = P())
       : a(valueA), b(valueB), c(valueC), d(valueD), e(valueE), f(valueF), g(valueG), h(valueH), i(valueI), j(valueJ), k(valueK), l(valueL), m(valueM), n(valueN), o(valueO), p(valueP)
   {}
   virtual void printTo(std::ostream &os) const
@@ -786,41 +793,41 @@ public:
   }
   void assign_from(ref_tuple<A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P> &from)
   {
-    in_assign< typename store_as<CA>::type, typename store_ref<A>::type >(a, from.a);
-    in_assign< typename store_as<CB>::type, B>(b, from.b);
-    in_assign< typename store_as<CC>::type, C>(c, from.c);
-    in_assign< typename store_as<CD>::type, D>(d, from.d);
-    in_assign< typename store_as<CE>::type, E>(e, from.e);
-    in_assign< typename store_as<CF>::type, F>(f, from.f);
-    in_assign< typename store_as<CG>::type, G>(g, from.g);
-    in_assign< typename store_as<CH>::type, H>(h, from.h);
-    in_assign< typename store_as<CI>::type, I>(i, from.i);
-    in_assign< typename store_as<CJ>::type, J>(j, from.j);
-    in_assign< typename store_as<CK>::type, K>(k, from.k);
-    in_assign< typename store_as<CL>::type, L>(l, from.l);
-    in_assign< typename store_as<CM>::type, M>(m, from.m);
-    in_assign< typename store_as<CN>::type, N>(n, from.n);
-    in_assign< typename store_as<CO>::type, O>(o, from.o);
-    in_assign< typename store_as<CP>::type, P>(p, from.p);
+    in_assign< typename store_as<CA>::type, typename store_ref<A>::type>(a, from.a);
+    in_assign< typename store_as<CB>::type, typename store_ref<B>::type>(b, from.b);
+    in_assign< typename store_as<CC>::type, typename store_ref<C>::type>(c, from.c);
+    in_assign< typename store_as<CD>::type, typename store_ref<D>::type>(d, from.d);
+    in_assign< typename store_as<CE>::type, typename store_ref<E>::type>(e, from.e);
+    in_assign< typename store_as<CF>::type, typename store_ref<F>::type>(f, from.f);
+    in_assign< typename store_as<CG>::type, typename store_ref<G>::type>(g, from.g);
+    in_assign< typename store_as<CH>::type, typename store_ref<H>::type>(h, from.h);
+    in_assign< typename store_as<CI>::type, typename store_ref<I>::type>(i, from.i);
+    in_assign< typename store_as<CJ>::type, typename store_ref<J>::type>(j, from.j);
+    in_assign< typename store_as<CK>::type, typename store_ref<K>::type>(k, from.k);
+    in_assign< typename store_as<CL>::type, typename store_ref<L>::type>(l, from.l);
+    in_assign< typename store_as<CM>::type, typename store_ref<M>::type>(m, from.m);
+    in_assign< typename store_as<CN>::type, typename store_ref<N>::type>(n, from.n);
+    in_assign< typename store_as<CO>::type, typename store_ref<O>::type>(o, from.o);
+    in_assign< typename store_as<CP>::type, typename store_ref<P>::type>(p, from.p);
   }
   void assign_to(ref_tuple<A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P> &to)
   {
     out_assign< typename store_as<CA>::type, typename store_ref<A>::type>(a, to.a);
-    out_assign< typename store_as<CB>::type, B>(b, to.b);
-    out_assign< typename store_as<CC>::type, C>(c, to.c);
-    out_assign< typename store_as<CD>::type, D>(d, to.d);
-    out_assign< typename store_as<CE>::type, E>(e, to.e);
-    out_assign< typename store_as<CF>::type, F>(f, to.f);
-    out_assign< typename store_as<CG>::type, G>(g, to.g);
-    out_assign< typename store_as<CH>::type, H>(h, to.h);
-    out_assign< typename store_as<CI>::type, I>(i, to.i);
-    out_assign< typename store_as<CJ>::type, J>(j, to.j);
-    out_assign< typename store_as<CK>::type, K>(k, to.k);
-    out_assign< typename store_as<CL>::type, L>(l, to.l);
-    out_assign< typename store_as<CM>::type, M>(m, to.m);
-    out_assign< typename store_as<CN>::type, N>(n, to.n);
-    out_assign< typename store_as<CO>::type, O>(o, to.o);
-    out_assign< typename store_as<CP>::type, P>(p, to.p);
+    out_assign< typename store_as<CB>::type, typename store_ref<B>::type>(b, to.b);
+    out_assign< typename store_as<CC>::type, typename store_ref<C>::type>(c, to.c);
+    out_assign< typename store_as<CD>::type, typename store_ref<D>::type>(d, to.d);
+    out_assign< typename store_as<CE>::type, typename store_ref<E>::type>(e, to.e);
+    out_assign< typename store_as<CF>::type, typename store_ref<F>::type>(f, to.f);
+    out_assign< typename store_as<CG>::type, typename store_ref<G>::type>(g, to.g);
+    out_assign< typename store_as<CH>::type, typename store_ref<H>::type>(h, to.h);
+    out_assign< typename store_as<CI>::type, typename store_ref<I>::type>(i, to.i);
+    out_assign< typename store_as<CJ>::type, typename store_ref<J>::type>(j, to.j);
+    out_assign< typename store_as<CK>::type, typename store_ref<K>::type>(k, to.k);
+    out_assign< typename store_as<CL>::type, typename store_ref<L>::type>(l, to.l);
+    out_assign< typename store_as<CM>::type, typename store_ref<M>::type>(m, to.m);
+    out_assign< typename store_as<CN>::type, typename store_ref<N>::type>(n, to.n);
+    out_assign< typename store_as<CO>::type, typename store_ref<O>::type>(o, to.o);
+    out_assign< typename store_as<CP>::type, typename store_ref<P>::type>(p, to.p);
   }
   virtual void printTo(std::ostream &os) const
   {

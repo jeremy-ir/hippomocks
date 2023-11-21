@@ -1,10 +1,12 @@
 #include "hippomocks.h"
 #include "gtest/gtest.h"
 #include <string>
+#include <list>
 
 class INext {
 public:
-        virtual void doSomeThing(std::string&& arg) = 0;
+        virtual void f(std::string&& arg) = 0;
+        virtual void g(int i, std::list<int>&& j) = 0;
 };
 
 TEST (TestMove, checkMoveAccepted)
@@ -13,8 +15,8 @@ TEST (TestMove, checkMoveAccepted)
 
     MockRepository mocks;
     INext *nextMock = mocks.Mock<INext>();
-    mocks.ExpectCall(nextMock, INext::doSomeThing).With(test1);
-    nextMock->doSomeThing("abcd");
+    mocks.ExpectCall(nextMock, INext::f).With(test1);
+    nextMock->f("abcd");
 }
 
 TEST (TestMove, checkMoveChecked)
@@ -23,7 +25,20 @@ TEST (TestMove, checkMoveChecked)
 
     MockRepository mocks;
     INext *nextMock = mocks.Mock<INext>();
-    mocks.ExpectCall(nextMock, INext::doSomeThing).With(test1);
-	EXPECT_THROW(nextMock->doSomeThing("bc"), HippoMocks::ExpectationException);
-	mocks.reset();
+    mocks.ExpectCall(nextMock, INext::f).With(test1);
+    EXPECT_THROW(nextMock->f("bc"), HippoMocks::ExpectationException);
+    mocks.reset();
+}
+
+std::list<int> makeList()
+{
+  return { 1, 2, 3 };
+}
+
+TEST (TestMove, checkMoveTwoAccepted)
+{
+    MockRepository mocks;
+    INext *nextMock = mocks.Mock<INext>();
+    mocks.ExpectCall(nextMock, INext::g).With(1, makeList());
+    nextMock->g(1, { 1, 2, 3 });
 }
