@@ -628,13 +628,13 @@ struct do_assign<T1, T2, false>
 template <typename T1, typename T2>
 void out_assign(T1 a, T2 b)
 {
-  do_assign<T1, T2, IsOutParamType<typename base_type<T1>::type>::value >::assign_to(a, std::forward<T2>(b));
+  do_assign<T1, T2, IsOutParamType<typename base_type<T1>::type>::value >::assign_to(a, b);
 }
 
 template <typename T1, typename T2>
 void in_assign(T1 a, T2 b)
 {
-  do_assign<T1, T2, IsInParamType<typename base_type<T1>::type>::value >::assign_from(a, std::forward<T2>(b));
+  do_assign<T1, T2, IsInParamType<typename base_type<T1>::type>::value >::assign_from(a, b);
 }
 
 template <typename B>
