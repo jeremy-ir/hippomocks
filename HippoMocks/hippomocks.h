@@ -637,6 +637,19 @@ void in_assign(T1 a, T2 b)
   do_assign<T1, T2, IsInParamType<typename base_type<T1>::type>::value >::assign_from(a, std::forward<T2>(b));
 }
 
+template <typename B>
+struct store_ref
+{
+  typedef B type;
+};
+
+template <typename B>
+struct store_ref<B&&>
+{
+  typedef B& type;
+};
+
+
 template <typename A = NullType, typename B = NullType, typename C = NullType, typename D = NullType,
       typename E = NullType, typename F = NullType, typename G = NullType, typename H = NullType,
       typename I = NullType, typename J = NullType, typename K = NullType, typename L = NullType,
@@ -644,7 +657,7 @@ template <typename A = NullType, typename B = NullType, typename C = NullType, t
 class ref_tuple : public base_tuple
 {
 public:
-  A a;
+  typename store_ref<A>::type a;
   B b;
   C c;
   D d;
@@ -660,8 +673,8 @@ public:
   N n;
   O o;
   P p;
-  ref_tuple(A valueA = A(), B valueB = B(), C valueC = C(), D valueD = D(), E valueE = E(), F valueF = F(), G valueG = G(), H valueH = H(), I valueI = I(), J valueJ = J(), K valueK = K(), L valueL = L(), M valueM = M(), N valueN = N(), O valueO = O(), P valueP = P())
-      : a(std::forward<A>(valueA)), b(valueB), c(valueC), d(valueD), e(valueE), f(valueF), g(valueG), h(valueH), i(valueI), j(valueJ), k(valueK), l(valueL), m(valueM), n(valueN), o(valueO), p(valueP)
+  ref_tuple(typename store_ref<A>::type valueA = A(), B valueB = B(), C valueC = C(), D valueD = D(), E valueE = E(), F valueF = F(), G valueG = G(), H valueH = H(), I valueI = I(), J valueJ = J(), K valueK = K(), L valueL = L(), M valueM = M(), N valueN = N(), O valueO = O(), P valueP = P())
+      : a(valueA), b(valueB), c(valueC), d(valueD), e(valueE), f(valueF), g(valueG), h(valueH), i(valueI), j(valueJ), k(valueK), l(valueL), m(valueM), n(valueN), o(valueO), p(valueP)
   {}
   virtual void printTo(std::ostream &os) const
   {
@@ -773,7 +786,7 @@ public:
   }
   void assign_from(ref_tuple<A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P> &from)
   {
-    in_assign< typename store_as<CA>::type, A>(a, std::forward<A>(from.a));
+    in_assign< typename store_as<CA>::type, typename store_ref<A>::type >(a, from.a);
     in_assign< typename store_as<CB>::type, B>(b, from.b);
     in_assign< typename store_as<CC>::type, C>(c, from.c);
     in_assign< typename store_as<CD>::type, D>(d, from.d);
@@ -792,7 +805,7 @@ public:
   }
   void assign_to(ref_tuple<A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P> &to)
   {
-    out_assign< typename store_as<CA>::type, A>(a, std::forward<A>(to.a));
+    out_assign< typename store_as<CA>::type, typename store_ref<A>::type>(a, to.a);
     out_assign< typename store_as<CB>::type, B>(b, to.b);
     out_assign< typename store_as<CC>::type, C>(c, to.c);
     out_assign< typename store_as<CD>::type, D>(d, to.d);
@@ -4914,7 +4927,7 @@ public:
     if (realMock->isZombie)
       RAISEEXCEPTION(ZombieMockException(realMock->repo));
     MockRepository *myRepo = realMock->repo;
-    myRepo->DoVoidExpectation(realMock, realMock->translateX(X), ref_tuple<A>(std::forward<A>(a)));
+    myRepo->DoVoidExpectation(realMock, realMock->translateX(X), ref_tuple<A>(a));
   }
   template <int X, typename A, typename B>
   void expectation2(A a, B b)

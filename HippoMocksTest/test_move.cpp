@@ -25,4 +25,5 @@ TEST (TestMove, checkMoveChecked)
     INext *nextMock = mocks.Mock<INext>();
     mocks.ExpectCall(nextMock, INext::doSomeThing).With(test1);
 	EXPECT_THROW(nextMock->doSomeThing("bc"), HippoMocks::ExpectationException);
+	mocks.reset();
 }
