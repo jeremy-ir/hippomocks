@@ -19,8 +19,7 @@
 - [TCall Class](#tcall-class)
   - [Return() Method](#return-method)
   - [With() Method](#with-method)
-  - [After() Method](#after-method)
-  - [Do() Method](#do-method)
+  - [After() Method](#after-
   - [Match() Method](#match-method)
   - [Throw() Method](#throw-method)
 - [Other Methods](#other-methods)
