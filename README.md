@@ -63,6 +63,9 @@ After declaring a mock, the mock will persist for the lifespan of the MockReposi
 ## OnCall() Method
 OnCall() is used to mock a function. The name of the function name behaves like a function pointer. In the event that it is called, you may make assertions or take actions on it.
 
+BUG BUG BUG: I believe the OnCall() method returns something that "must" be used to do something useful.  That should be explicitly stated, a listing
+of how that "something" is used would be useful.
+
 ### OnCallFunc(funcName)
 ``` C++
 // test.cpp
@@ -71,6 +74,7 @@ OnCall() is used to mock a function. The name of the function name behaves like 
 TEST(MyTestSuite, MyTestName) {
   MockRepository mocks;
   mocks.OnCallFunc(bar)...
+  BUG BUG BUG:  the line above should be a complete "thought."  There should be at least one "complete example" of usable code.
  
   foo();
 }
@@ -89,6 +93,8 @@ TEST(MyTestSuite, MyTestName) {
   // bar1() must be called, then bar2()
   mocks.ExpectCallFunc(bar1)...
   mocks.ExpectCallFunc(bar2)...
+
+  BUG BUG BUG:  The ... in the example make me think the code is incomplete.  Does it make sense to have `mocks.ExpectCallFunc(bar1);`?  If not, what are typical calls that are made based on the thing returned?
   foo();
 }
 ```
@@ -105,6 +111,7 @@ TEST(MyTestSuite, MyTestName) {
   // bar() must be called 3 times in a row
   mocks.ExpectCallsFunc(bar, 3)...
  
+ BUG BUG BUG: same issue with the ...
   foo();
 }
 ```
@@ -120,13 +127,14 @@ TEST(MyTestSuite, MyTestName) {
 
   // bar() must be called at least 3 times in a row
   mocks.ExpectMinCallsFunc(bar, 3)...
+  BUG BUG BUG: same issue with the ...
 
   foo();
 }
 ```
 
 ### Disable ExpectCall Order Requirement
-In order to disable the order expectation functionality, you can denote that by setting the "autoExpect" flag to "false".
+In order to disable the order expectation functionality (as explained/noted in [ExpectCall() Method](#expectcall-method)), you can denote that by setting the "autoExpect" flag to "false".
 
 ``` C++
 #include "hippomocks.h"
@@ -138,6 +146,8 @@ TEST(MyTestSuite, MyTestName) {
   // bar1() and bar2() must be called, but in any order
   mocks.ExpectCallFunc(bar1)...
   mocks.ExpectCallFunc(bar2)...
+
+  BUG BUG BUG: more use of ambiguous ...
  
   FooBar();
 }
@@ -155,6 +165,7 @@ TEST(MyTestSuite, MyTestName) {
   
   // If bar() is called, throw an exception into the test
   mocks.NeverCallFunc(bar)...
+  BUG BUG BUG: more use of ambiguous ...
  
   Foo();
 }
@@ -182,20 +193,26 @@ TEST(MyTestSuite, MyTestName) {
 Now, whenever ReturnByValue() is called, it will return a result of 55. If you are returning a value through a function argument (pass-by-reference, pass-by-pointer), refer to the [Out() Method](#out-method).
 
 ## With() Method
-With() lets you assert that a function is called with specific arguments. If you do not care about all of the arguments that are being passed in, you may use "_" for each arg you want to not match against. If any of the arguments do not match those in the With() statement, an exception will be thrown.
+With() lets you assert that a function is called with specific arguments. If you do not care about all of the arguments that are being passed in, you may use `_` for each arg you want to not match against. If any of the arguments do not match those in the With() statement, an exception will be thrown.
 
 ``` C++
 #include "hippomocks.h"
  
+int global;
 TEST(MyTestSuite, MyTestName) {
   MockRepository mocks;
-  mocks.ExpectCallFunc(multiArgFunc).With(12, "hello", _)...;
+  mocks.ExpectCallFunc(multiArgFunc).With(12, &global, _)...;
  
+ BUG BUG BUG: use of ...
   foo();
 }
 ```
 
-When MultiArgFunc() is called, it will expect a first numerical argument of 12 and a second string argument of "hello". It does not care about what the third argument is. If you want to do something more complicated than a simple value comparison, refer to the [In() method](#in-method) for general purpose complex operations, the [Deref() method](#deref-method) if you specifically want to get the value behind a pointer, or the [Do() method](#do-method) where none of these options suffice.
+Be aware that two strings "abc" and "abc" may or may not compare equal.  Your compiler may determine that the two are the same and allocate a single block of memory for the string; however, the compiler may also allocate two blocks of memory.  Recall that when used as an argument to a function "abc" is a pointer to char.
+
+BUG BUG BUG: probably should show how to address this "common?" case.
+
+When MultiArgFunc() is called, it will expect a first numerical argument of 12 and a second pointer to int argument with the address of `global`. It does not care about what the third argument is. If you want to do something more complicated than a simple value comparison, refer to the [In() method](#in-method) for general purpose complex operations, the [Deref() method](#deref-method) if you specifically want to get the value behind a pointer, or the [Do() method](#do-method) where none of these options suffice.
 
 ## After() Method
 After() allows you to mandate a specific sequence that function calls must take. If a mocked function is called before the Call object it is "After'ed", an exception will be thrown. This is useful when you only care about the order of a subset of the functions you are mocking.
@@ -208,6 +225,7 @@ TEST(MyTestSuite, MyTestName) {
   mocks.autoExpect = false
   ...
   Call& alpha = mocks.ExpectCallFunc(bar1).Return(33);
+  BUG BUG BUG: I'm not C++ expert, but in C the previous line would be illegal since `Call & alpha` is not an `lvalue`, it is an expression that evaluates to the bitwise AND of `Call` and `alpha`.  If there is something "interesting" relative to C++ it might be good to document/explain.
   mocks.OnCallFunc(bar2).After(alpha);
   ...
   FooBar();
@@ -228,6 +246,7 @@ TEST(MyTestSuite, MyTestName) {
   Call& gamma = ...
   mocks.OnCallFunc(bar4).After(alpha).After(beta).After(gamma);
   ...
+  BUG BUG BUG: way too many ...'s in this example.
   foo();
 }
 ```
@@ -248,6 +267,7 @@ void bar_fake(int* value, int param) {
  
 TEST(MyTestSuite, MyTestName) {
   MockRepository Mocks;
+  // When bar is called convert it to a call to bar_fake()
   mocks.OnCallFunc(bar).Do(bar_fake);
  
   foo();
@@ -268,6 +288,8 @@ TEST(MyTestSuite, MyTestName) {
   counter = 0; // Reset the global value for the test
  
   foo();
+  BUG BUG BUG: would the previous line be better as `bar(&x, 3)` and declare x as an integer?  I think so based on the `EXPECT_EQ` below.
+  This suggest we should go through all the examples and ensure they compile and work.  Use /* more here */ or /* ... */ for places where more code might normally go, but maybe that could be skipped since these are just examples
   EXPECT_EQ(1, counter);
 }
 ```
@@ -275,14 +297,34 @@ TEST(MyTestSuite, MyTestName) {
 Note that you can also use a lambda to help reduce clutter in your test files.
 
 ``` C++
+// code being tested:
+void foo(void) {
+  int returnedValue;
+
+  bar(1, &returnedValue);
+}
+
+void bar(int arg1, int *arg2) {
+  /* not overly relvant since hippomocks will call the lamda function
+     instead of this.  The intent here is to show that "bar()" does not
+     have to be called diretly from the unit test; it can be called
+     by something (foo() in this case) called in the unit test.
+
+     The wording above still needs work, perhaps even complete replacement.
+  */
+}
+
+// unit test code using hippomocks
 #include "hippomocks.h"
  
 TEST(MyTestSuite, MyTestName) {
   MockRepository Mocks;
   mocks.OnCallFunc(bar)
        .Do([](auto* value, auto param) { (param < 0) ? *value = 13 : *value = 22; });
+       // In this example, bar() returns data via its second parameter.  The lambda function is invoked instead of bar() and the lamda function will evaluate the first argument, if the first argument is < 0 then the value returned in the second parameter will be 13; otherwise the value returned will be 22.
  
   foo();
+  BUG BUG BUG: I think the above line should call bar and should call it with two arguments.  I expect the two arguments are appropriate since the lamda function takes two arguments.
 }
 ```
 
@@ -291,16 +333,21 @@ You can even inline unit test checkers, though you cannot use any checkers that 
 ``` C++
 #include "hippomocks.h"
 
+int x;
+
 TEST(MyTestSuite, MyTestName) {
   MockRepository Mocks;
   mocks.OnCallFunc(bar)
        .Do([](auto* value, auto param) {
-                EXPECT_NE(value, nullptr)
-                EXPECT_EQ(0xFA, *value)
+                EXPECT_NE(value, nullptr)               // when bar() is called report error if first parameter is nullptr
+                if (value != nullptr) {
+                  EXPECT_EQ(0xFA, *value) // when bar() is called report error if first parameter does not point to a value containing 0xfa
+                }
             }
           );
  
-  foo();
+  bar(&x, 3);
+  
 }
 ```
 
@@ -314,16 +361,42 @@ bool belowThree(int* value, int param) { return (param < 3); }
 bool aboveTwelve(int* value, int param) { return (param > 12); }
  
 TEST(MyTestSuite, MyTestName) {
+  // I added this because the existing code used 12 for two different
+  // purposes.  That could lead to some confusion:  Which 12 is this?
+  enum { lessThan3, inBetweenThings, greaterThan12 };
   MockRepository Mocks;
-  mocks.OnCallFunc(bar).Return(12);
-  mocks.OnCallFunc(bar).Match(belowThree).Return(-45);
-  mocks.OnCallFunc(bar).Match(aboveTwelve).Return(77);
+  mocks.OnCallFunc(bar).Return(inBetweenThings);
+  mocks.OnCallFunc(bar).Match(belowThree).Return(lessThan3);
+  mocks.OnCallFunc(bar).Match(aboveTwelve).Return(greaterThan12);
  
-  foo();
+  // bar(1) returns inBetweenThings because none of the Match() functions fires; this comment still needs rewording.
+  EXPECT_EQ(bar(4), inBetweenThings);
+
+  // The Match(aboveTwelve) "fires" in the next two lines of code, so
+  // hippomocks causes the function to return greaterThan12
+  EXPECT_EQ(bar(14), greaterThan12);
+  EXPECT_EQ(bar(37), greaterThan12);
+
+  // The Match(belowThree) "fires" in the next line of code, so hippomocks
+  // causes the function to return lessThan3
+  EXPECT_EQ(bar(2), lessThan3);
+
+
+  // The next three lines summarize typical usages and the results
+  // BUG BUG BUG: can we word this bettr?  Is this redundant after
+  // all the code above?
+  // for all values less than 3...
+  EXPECT_EQ(bar(2), lessThan3;
+  // for all values between 3 and 12 inclusive
+  EXPECT_EQ(bar(5), inBetweenThings);
+  EXPECT_EQ(bar(23), greaterThan12);
 }
 ```
 
-If the value of our param argument is below 3, we will return -45. If it is above 12, we will return 77. Otherwise, we default and return 12.
+If the value of our param argument is less than (below) 3, we will return `lessThan3`.
+If it is above 12, we will return `greaterThan12`.
+Otherwise, we default and return `inBetweenThings`.
+NOTE NOTE NOTE:  I like the way this is explained, but would like to clarify potential "edge" conditions in the example.  Would this be better with some named constants, especially for the return values and second argument to EXPECT_EQ?
 
 ## Throw() Method
 Throw() lets you throw a custom exception when a function is called. It can be used in conjunction with [Match()](#match-method) to set up complex conditional assertions.
@@ -338,7 +411,7 @@ TEST(MyTestSuite, MyTestName) {
   mocks.OnCallFunc(bar).Return(12);
   mocks.OnCallFunc(bar).Match(belowThree).Throw(std::exception());
   
-  EXPECT_THROW(foo(), std::exception);
+  EXPECT_THROW(bar(1), std::exception);
 }
 ```
 
@@ -347,6 +420,12 @@ This can be particularly useful if you are working in C where you do not have ex
 ``` C++
 #include "hippomocks.h"
   
+void
+foo(void)
+{
+  exit(1);   // always "fail"
+}
+
 TEST(MyTestSuite, MyTestName) {
   MockRepository Mocks;
   mocks.OnCallFunc(exit).Throw(std::exception);
@@ -371,20 +450,31 @@ void bar(int input);
 TEST(MyTestSuite, MyTestName) {
   MockRepository Mocks;
   int paramVal;
-  mocks.OnCallFunc(bar).With(In(paramVal));
+  mocks.OnCallFunc(bar).With(In(paramVal));    // when bar() is called copy first paramter to paramVal
  
-  foo();
+  bar(2);
   EXPECT_TRUE(paramVal % 2 == 0); // Check if the parameter being passed in is even
 }
 ```
 
 ``` C++
 // source.cpp
-void bar(int* input);
+void bar(int* input)
+{
+  // Nothing per se, but typically would have real code
+}
 
 // test.cpp
 #include "hippomocks.h"
  
+void Foo(void)
+{
+  int x = 2;
+
+  bar(&x);     // not that x will not "exist" after Foo() returns
+}
+
+
 TEST(MyTestSuite, MyTestName) {
   MockRepository Mocks;
   int* paramValPtr = NULL;
@@ -392,11 +482,17 @@ TEST(MyTestSuite, MyTestName) {
   mocks.OnCallFunc(bar).With(In(paramValPtr));
  
   Foo();
+
+  // This could fail even though bar() was called with a pointer to 2
+  // the reason being that the pointer is not valid after Foo() returns since
+  // the pointer pointed to a local variable that is not valid after Foo()
+  // returns
+  ASSERT_NE(paramValPtr, nullptr);
   EXPECT_TRUE(*paramValPtr % 2 == 0); // Check if the parameter is even
                                       // Be aware of the risk of clobbering
 }
 ```
-Note: for the purposes of [With() method](#with-method) matching, In() is treated like "_"
+Note: for the purposes of [With() method](#with-method) matching, In() is treated like `_`
 
 
 ## Out() Method
@@ -404,22 +500,35 @@ The Out() Method allows you to specify a return value for an argument that is pa
 
 ``` C++
 // source.cpp
-void returnByPointerFunc(int* retVal);
+void returnByPointerFunc(int* retVal)
+{
+  *retVal = 3;
+}
+
+int foo(void)
+{
+  int x;
+
+  returnByPointerFunc(&x);
+  return x;
+}
 
 // test.cpp
 #include "hippomocks.h"
  
 TEST(MyTestSuite, MyTestName) {
   MockRepository Mocks;
+
+  EXPECT_EQ(foo(), 3);  // no mocking so what you would expect
+
   mocks.OnCallFunc(returnByPointerFunc).With(Out(72));
- 
-  foo();
+  EXPECT_EQ(foo(), 72); // not 3 because of the mocking
 }
 ```
 
 When returnByPointer() is called, the mock will intercept the call and set the argument to 72. The source code will continue to execute as normal afterwards.
 
-Note: for the purposes of [With() method](#with-method) matching, Out() is treated like "_"
+Note: for the purposes of [With() method](#with-method) matching, Out() is treated like `_`
 
 ## Deref() Method
 The Deref() Method allows you to check the value stored at the address a pointer is pointing to.
@@ -432,16 +541,20 @@ void bar(int* input);
 #include "hippomocks.h"
  
 TEST(MyTestSuite, MyTestName) {
+  int x;
   MockRepository Mocks;
   mocks.OnCallFunc(bar).With(Deref(0xFA));
  
-  foo();
+  x = 0xFA;
+  bar(&x);  // pass
+  x = 1;
+  bar(&x);  // fail
 }
 ```
-When bar() is called, the first argument (which is a pointer) will be dereferenced after an NPE check and compared to the value of 0xFA. If the dereferenced pointer matches, the test will pass, otherwise the mocking framework with throw an exception.
+When bar() is called, the first argument (which is a pointer) will be dereferenced after an NPE (Null Pointer Exception) check and compared to the value of 0xFA. If the dereferenced pointer matches, the test will pass, otherwise the mocking framework with throw an exception.
 
 Note: this only works with pass-by-pointer parameters.
-Note: for the purposes of [With() method](#with-method) matching, Deref() is treated like "_"
+Note: for the purposes of [With() method](#with-method) matching, Deref() is treated like `_`
 
 # Gotchas
 * If you mock an empty function, the opcode patching that Hippomocks performs will clobber code that comes lower in the compiled object file. You may see issues like Segmentation Faults, trace/breakpoint trap, floating point exception, illegal instruction error, etc.
@@ -450,7 +563,7 @@ void foo() {
   return;
 }
 
-// If function foo is mocked, function bar is clobbered
+// If function foo is mocked, function bar is likely to be clobbered if the compiler places the two functions in consecutive memory locations
 int bar() {
   //...
 }
