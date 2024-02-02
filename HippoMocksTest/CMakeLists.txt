@@ -27,6 +27,7 @@ add_executable(${PROJECT_NAME}
 	test_inparam.cpp
 	test_membermock.cpp
 	test_mi.cpp
+	test_move.cpp
 	test_nevercall.cpp
 	test_objectreturn.cpp
 	test_optional.cpp
